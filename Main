@@ -20,8 +20,11 @@ void Encender_LED(int led, int tiempo) {
     }
     
     digitalWrite(pin, HIGH); // Encender LED
+    Serial.printf("Led %d, encendida %d ms\n", led, tiempo); // Mostrar mensaje en el monitor serial
     delay(tiempo); // Esperar el tiempo en ms
     digitalWrite(pin, LOW); // Apagar LED
+    Serial.printf("Led %d, apagada\n", led); // Mostrar mensaje de apagado
+
 }
 
 void mostrarMenu() {
@@ -31,7 +34,7 @@ void mostrarMenu() {
 }
 
 void lecturaADC() {
-    int valorADC = analogRead(34); // Leer el canal analógico (pin 34)
+    int valorADC = analogRead(35); // Leer el canal analógico (pin 34)
     float voltaje = (valorADC / 4095.0) * 3.3; // Convertir a voltaje (3.3V es el máximo)
     Serial.printf("Voltaje: %.2fV\n", voltaje);
     Serial.printf (" V");
@@ -59,7 +62,7 @@ void controlarLEDs() {
                     mostrarMenu();
                     break; // Salir del bucle
                 } else {
-                    Serial.println("Entrada invalida. Intente de nuevo.");
+                    Serial.println("Entrada invalida. Intente de nuevo. Seleccione una LED dentro del rango 1-3.");
                 }
             } else {
                 Serial.println("Formato incorrecto. Intente de nuevo.");
