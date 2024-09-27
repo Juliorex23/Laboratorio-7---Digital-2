@@ -1,0 +1,91 @@
+//Universidad del Valle de Guatemala
+//Electrónica Digital 2
+//Julio Pérez 221023
+//Laboratorio 7 - UART
+#include <Arduino.h>
+
+const int LED1 = 2; // Define el pin del LED1
+const int LED2 = 4; // Define el pin del LED2
+const int LED3 = 16; // Define el pin del LED3
+
+void Encender_LED(int led, int tiempo) {
+    int pin;
+    
+    // Determinar el pin correspondiente al LED
+    switch (led) {
+        case 1: pin = LED1; break;
+        case 2: pin = LED2; break;
+        case 3: pin = LED3; break;
+        default: return; // LED inválido
+    }
+    
+    digitalWrite(pin, HIGH); // Encender LED
+    delay(tiempo); // Esperar el tiempo en ms
+    digitalWrite(pin, LOW); // Apagar LED
+}
+
+void mostrarMenu() {
+    Serial.println("Menu:");
+    Serial.println("1. Lectura ADC");
+    Serial.println("2. Controlar LEDs");
+}
+
+void lecturaADC() {
+    int valorADC = analogRead(34); // Leer el canal analógico (pin 34)
+    float voltaje = (valorADC / 4095.0) * 3.3; // Convertir a voltaje (3.3V es el máximo)
+    Serial.printf("Voltaje: %.2fV\n", voltaje);
+    Serial.printf (" V");
+    mostrarMenu();
+}
+
+void controlarLEDs() {
+    Serial.println("Ingrese el LED y tiempo en ms (Ej: 1,500):");
+    
+    while (true) {
+        if (Serial.available()) {
+            String entrada = Serial.readStringUntil('\n');
+            int led;
+            int tiempo;
+            
+            // Separar la entrada en LED y tiempo
+            int separador = entrada.indexOf(',');
+            if (separador != -1) {
+                led = entrada.substring(0, separador).toInt();
+                tiempo = entrada.substring(separador + 1).toInt();
+                
+                // Verificar valores
+                if ((led >= 1 && led <= 3) && (tiempo > 0)) {
+                    Encender_LED(led, tiempo);
+                    mostrarMenu();
+                    break; // Salir del bucle
+                } else {
+                    Serial.println("Entrada invalida. Intente de nuevo.");
+                }
+            } else {
+                Serial.println("Formato incorrecto. Intente de nuevo.");
+            }
+        }
+    }
+}
+
+void setup() {
+    Serial.begin(115200); // Inicializar UART
+    pinMode(LED1, OUTPUT);
+    pinMode(LED2, OUTPUT);
+    pinMode(LED3, OUTPUT);
+    mostrarMenu();
+}
+
+void loop() {
+    if (Serial.available()) {
+        String opcion = Serial.readStringUntil('\n'); // Leer opción del usuario
+        if (opcion == "1") {
+            lecturaADC();
+        } else if (opcion == "2") {
+            controlarLEDs();
+        } else {
+            Serial.println("Opcion invalida");
+            mostrarMenu();
+        }
+    }
+}
